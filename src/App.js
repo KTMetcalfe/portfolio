@@ -1,11 +1,11 @@
 import './App.css';
 
 import React from 'react';
-import { Suspense, useLayoutEffect, useEffect } from 'react';
+import { Suspense } from 'react';
 import * as THREE from "three";
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
+import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
-import { Physics, useBox, useSphere } from '@react-three/cannon';
+import { Physics, useSphere } from '@react-three/cannon';
 
 import sunImg from './images/2k_sun.jpg';
 import mercuryImg from './images/2k_mercury.jpg';
