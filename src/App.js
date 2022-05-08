@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Stars } from '@react-three/drei';
 import { Physics, useSphere } from '@react-three/cannon';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 
 import sunImg from './images/2k_sun.jpg';
 import mercuryImg from './images/2k_mercury.jpg';
@@ -16,6 +17,8 @@ import jupiterImg from './images/2k_jupiter.jpg';
 import saturnImg from './images/2k_saturn.jpg';
 import uranusImg from './images/2k_uranus.jpg';
 import neptuneImg from './images/2k_neptune.jpg';
+
+import Model from './Lantern';
 
 function Planet({ distance, size, speed, rotation, name }) {
   // Allows for physics
@@ -37,7 +40,7 @@ function Planet({ distance, size, speed, rotation, name }) {
   // Chooses appropriate planet texture
   let map = null;
   switch (name) {
-    case 'Sun':
+    default:
       map = sunImg;
       break;
     case 'Mercury':
@@ -91,11 +94,15 @@ function App() {
   // Main renderer
   return (
     <div className="App">
+
       <Canvas colorManagement>
         <Stars radius={250} />
         <OrbitControls />
         <ambientLight intensity={0.05} />
         <pointLight intensity={2} />
+        <Suspense fallback={null}>
+          <Model />
+        </Suspense>
         <Physics>
           <Suspense fallback={null}>
             <Planet distance={0} size={20 * earthSize} speed={0} rotation={revTime * 27} name='Sun' />
