@@ -10,7 +10,7 @@ export default function Model({ ...props }) {
   const { nodes, materials } = useGLTF('/lantern/Lantern.gltf')
   return (
     <group ref={group} {...props} dispose={null}>
-      <group rotation={[-Math.PI, 0, -Math.PI]} position={[-40, 0, 0]}>
+      <group rotation={[-Math.PI, 0, -Math.PI]} position={[0, 0, 0]}>
         <mesh geometry={nodes.LanternPole_Body.geometry} material={materials.LanternPost_Mat} position={[-3.82, 13.02, 0]} />
         <mesh geometry={nodes.LanternPole_Chain.geometry} material={materials.LanternPost_Mat} position={[-9.58, 21.04, 0]} />
         <mesh geometry={nodes.LanternPole_Lantern.geometry} material={materials.LanternPost_Mat} position={[-9.58, 18.01, 0]} />

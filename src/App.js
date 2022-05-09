@@ -19,6 +19,7 @@ import uranusImg from './images/2k_uranus.jpg';
 import neptuneImg from './images/2k_neptune.jpg';
 
 import Model from './Lantern';
+import Starbase from './Interior';
 
 function Planet({ distance, size, speed, rotation, name }) {
   // Allows for physics
@@ -85,7 +86,7 @@ function Planet({ distance, size, speed, rotation, name }) {
 
 function App() {
   // Seconds (60 frames) per year (1 earth revolution)
-  const revTime = 365;
+  const revTime = 31540000;
 
   // Constants for comparison
   const earthDist = 100;
@@ -94,29 +95,15 @@ function App() {
   // Main renderer
   return (
     <div className="App">
-
-      <Canvas colorManagement>
+      <Canvas colorManagement camera={{ fov: 45, position: [40, 40, 40] }}>
         <Stars radius={250} />
-        <OrbitControls />
-        <ambientLight intensity={0.05} />
-        <pointLight intensity={2} />
+        <OrbitControls target={[0, 10, 0]} />
+        <ambientLight intensity={10} />
+        <pointLight intensity={1} position={[0,4,-5]} />
         <Suspense fallback={null}>
           <Model />
+          <Starbase />
         </Suspense>
-        <Physics>
-          <Suspense fallback={null}>
-            <Planet distance={0} size={20 * earthSize} speed={0} rotation={revTime * 27} name='Sun' />
-            <Planet distance={0.39 * earthDist} size={0.38 * earthSize} speed={revTime / 0.62} rotation={revTime * 58.67} name='Mercury' />
-            <Planet distance={0.72 * earthDist} size={0.95 * earthSize} speed={revTime / 0.24} rotation={revTime * 243.02} name='Venus' />
-            <Planet distance={earthDist} size={earthSize} speed={revTime} rotation={revTime * 0.99} name='Earth' />
-            {/* Distance is SCALED DOWN for the last five planets */}
-            <Planet distance={1.52 * earthDist / 1.25} size={0.53 * earthSize} speed={revTime / 1.88} rotation={revTime * 1.02} name='Mars' />
-            <Planet distance={5.2 * earthDist / 3} size={10.97 * earthSize} speed={revTime / 11.86} rotation={revTime * 0.42} name='Jupiter' />
-            <Planet distance={9.54 * earthDist / 4} size={9.14 * earthSize} speed={revTime / 29.46} rotation={revTime * 0.44} name='Saturn' />
-            <Planet distance={19.18 * earthDist / 6} size={3.98 * earthSize} speed={revTime / 164.79} rotation={revTime * 0.72} name='Uranus' />
-            <Planet distance={30.06 * earthDist / 8} size={3.86 * earthSize} speed={revTime / 248.59} rotation={revTime * 0.67} name='Neptune' />
-          </Suspense>
-        </Physics>
       </Canvas>
     </div>
   );
