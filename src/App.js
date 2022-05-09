@@ -18,8 +18,6 @@ import saturnImg from './images/2k_saturn.jpg';
 import uranusImg from './images/2k_uranus.jpg';
 import neptuneImg from './images/2k_neptune.jpg';
 
-import Model from './Lantern';
-
 function Planet({ distance, size, speed, rotation, name }) {
   // Allows for physics
   const [ref, api] = useSphere(() => ({ position: [0, 0, -distance] }));
@@ -100,9 +98,6 @@ function App() {
         <OrbitControls />
         <ambientLight intensity={0.05} />
         <pointLight intensity={2} />
-        <Suspense fallback={null}>
-          <Model />
-        </Suspense>
         <Physics>
           <Suspense fallback={null}>
             <Planet distance={0} size={20 * earthSize} speed={0} rotation={revTime * 27} name='Sun' />
