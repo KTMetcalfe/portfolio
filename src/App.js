@@ -43,7 +43,13 @@ function Planet({ distance, size, speed, rotation, name }) {
     const offset = planetRef.current.position.applyEuler(eu);
     planetApi.position.copy(offset);
 
-    textRef.current.lookAt(new THREE.Vector3(0, offset.y + size + 5, 0))
+    if (state.selectedRef !== null && state.selectedRef.current !== null && state.selectedRef.current.geometry.parameters !== null) {
+      const goodPos = new THREE.Vector3(state.selectedRef.current.position.x, state.selectedRef.current.position.y + (2 * state.selectedRef.current.geometry.parameters.radius), state.selectedRef.current.position.z)
+        .multiplyScalar(1 + (5 * (state.selectedRef.current.geometry.parameters.radius / state.selectedRef.current.position.distanceTo(new THREE.Vector3(0, 0, 0)))));
+      textRef.current.lookAt(goodPos);
+    } else {
+      textRef.current.lookAt(new THREE.Vector3(0, offset.y + size * 2, 0));
+    }
 
     planetApi.rotation.set(planetRef.current.rotation.x, planetRef.current.rotation.y += THREE.MathUtils.degToRad(360 / rotation), planetRef.current.rotation.z);
   });
@@ -86,11 +92,11 @@ function Planet({ distance, size, speed, rotation, name }) {
     <mesh name={name} ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun' && name !== state.selectedRef?.current.name) { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
       <Text
         ref={textRef}
-        position={[0, size + 5, 0]}
+        position={[0, size * 2, 0]}
         scale={[size * 10, size * 10, size * 10]}
         color='white'
       >
-        {name}
+        {name !== state.selectedRef?.current.name ? name : ''}
       </Text>
       <sphereBufferGeometry args={[size]} />
       {map != null ?
@@ -116,9 +122,12 @@ function CameraControls() {
     controls.current.update();
 
     // Locks camera to target
-    if (state.selectedRef !== null && state.selectedRef.current !== null) {
+    if (state.selectedRef !== null && state.selectedRef.current !== null && state.selectedRef.current.geometry.parameters !== null) {
       camera.lookAt(0, 0, 0);
-      const goodPos = new THREE.Vector3(state.selectedRef.current.position.x, state.selectedRef.current.position.y + 20, state.selectedRef.current.position.z).multiplyScalar(1.5)
+      // Moves camera to 1.(5 * planet's width as fraction of distance)
+      const goodPos = new THREE.Vector3(state.selectedRef.current.position.x, state.selectedRef.current.position.y + (2 * state.selectedRef.current.geometry.parameters.radius), state.selectedRef.current.position.z)
+        .multiplyScalar(1 + (5 * (state.selectedRef.current.geometry.parameters.radius / state.selectedRef.current.position.distanceTo(new THREE.Vector3(0, 0, 0)))))
+
       if (state.shouldLerp === true) {
         camera.position.lerp(goodPos, .1);
         setTimeout(() => {
@@ -193,7 +202,7 @@ function App() {
         <label className='overlayText'>{secPerYear === 31536000 ? '(1 second = 1 second)' : secPerYear === 365 ? '(1 second = 1 day)' : (365 / secPerYear).toFixed(2)}x</label>
         <button disabled={secPerYear === 31536000} className='overlayText' onClick={() => setSecPerYear(31536000)}>Realtime</button>
       </div>
-      <Canvas colorManagement camera={{ position: [50, 50, 50] }}>
+      <Canvas camera={{ position: [50, 50, 50] }}>
         <AppContext.Provider value={{ state, setState }} >
           <Stars radius={250} />
           <CameraControls />
