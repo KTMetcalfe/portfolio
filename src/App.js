@@ -25,7 +25,7 @@ extend({ TextGeometry })
 
 function Planet({ distance, size, speed, rotation, name }) {
   // Allows for global state
-  const { setState } = useContext(AppContext);
+  const { state, setState } = useContext(AppContext);
 
   // Allows for physics
   const [planetRef, planetApi] = useSphere(() => ({ position: [0, 0, -distance] }));
@@ -83,7 +83,7 @@ function Planet({ distance, size, speed, rotation, name }) {
 
   // Returns the planet
   return (
-    <mesh ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun') { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
+    <mesh name={name} ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun' && name !== state.selectedRef?.current.name) { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
       <Text
         ref={textRef}
         position={[0, size + 5, 0]}
@@ -160,7 +160,7 @@ function App() {
   // Resets target
   document.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    if (state.selectedRef !== null) {
+    if (state.selectedRef !== null && state.shouldLerp !== true) {
       setState({ selectedRef: null, shouldLerp: true })
     }
   }, false)
@@ -169,6 +169,18 @@ function App() {
   return (
     <div className="App">
       <div className='overlay'>
+        {/* <select className='overlayText' value={state.selectedRef === null ? 'default' : state.selectedRef?.current.name} onSelect={e => {}}>
+          <option disabled selected value={'default'}>Select a planet</option>
+          <option value={"Mercury"}>Mercury</option>
+          <option value={"Venus"}>Venus</option>
+          <option value={"Earth"}>Earth</option>
+          <option value={"Mars"}>Mars</option>
+          <option value={"Jupiter"}>Jupiter</option>
+          <option value={"Saturn"}>Saturn</option>
+          <option value={"Uranus"}>Uranus</option>
+          <option value={"Neptune"}>Neptune</option>
+        </select> */}
+        <button disabled={state.shouldLerp === true} className='overlayText' onClick={() => { setState({ selectedRef: null, shouldLerp: true }) }}>Deselect</button>
         <input type='range' min={1} max={1825} value={secPerYear} step={1} list='steplist' className='overlayInput' onInput={e => setSecPerYear(e.target.value)}></input>
         <datalist id='steplist'>
           <option>1</option>

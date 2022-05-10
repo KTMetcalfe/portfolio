@@ -11,6 +11,11 @@
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
+.overlay {
+  left: 0;
+  top: 0;
+}
+
 .overlayText, .overlayInput {
   margin-left: 1%;
   color: white;
