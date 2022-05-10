@@ -96,7 +96,7 @@ function Planet({ distance, size, speed, rotation, name }) {
         scale={[size * 10, size * 10, size * 10]}
         color='white'
       >
-        {name !== state.selectedRef?.current.name ? name : ''}
+        {name !== 'Sun' && name !== state.selectedRef?.current.name ? name : ''}
       </Text>
       <sphereBufferGeometry args={[size]} />
       {map != null ?
