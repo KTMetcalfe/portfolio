@@ -169,7 +169,7 @@ function App() {
   // Main renderer
   return (
     <div className="App">
-      <div>
+      <div className='overlay'>
         <input type='range' min={1} max={1825} value={secPerYear} step={1} list='steplist' className='overlayInput' onInput={e => setSecPerYear(e.target.value)}></input>
         <datalist id='steplist'>
           <option>1</option>
