@@ -191,6 +191,7 @@ function App() {
           <option>1825</option>
         </datalist>
         <label className='overlayText'>{(365 / secPerYear).toFixed(2)}x</label>
+        <button disabled={secPerYear === 31536000} className='overlayText' onClick={() => setSecPerYear(31536000)}>Realtime</button>
       </div>
       <Canvas colorManagement camera={{ position: [50, 50, 50] }}>
         <AppContext.Provider value={{ state, setState }} >
