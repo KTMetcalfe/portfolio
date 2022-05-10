@@ -1,12 +1,13 @@
 import './App.css';
 
-import React, { useContext, useCallback, useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Suspense } from 'react';
 import * as THREE from "three";
 import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars, useCamera } from '@react-three/drei';
+import { OrbitControls, Stars, Text } from '@react-three/drei';
 import { Physics, useSphere } from '@react-three/cannon';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { extend } from '@react-three/fiber';
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 
 import sunImg from './images/2k_sun.jpg';
 import mercuryImg from './images/2k_mercury.jpg';
@@ -20,11 +21,16 @@ import neptuneImg from './images/2k_neptune.jpg';
 
 const AppContext = React.createContext({});
 
+extend({ TextGeometry })
+
 function Planet({ distance, size, speed, rotation, name }) {
+  // Allows for global state
   const { setState } = useContext(AppContext);
 
   // Allows for physics
-  const [ref, api] = useSphere(() => ({ position: [0, 0, -distance] }));
+  const [planetRef, planetApi] = useSphere(() => ({ position: [0, 0, -distance] }));
+
+  const textRef = useRef(() => ({ position: [0, size + 5, 0] }));
 
   // Updates object every frame
   useFrame(() => {
@@ -33,10 +39,12 @@ function Planet({ distance, size, speed, rotation, name }) {
       THREE.MathUtils.degToRad(speed === 0 ? 0 : 360 / speed / 60),
       THREE.MathUtils.degToRad(0)
     );
-    const offset = ref.current.position.applyEuler(eu);
-    api.position.copy(offset);
 
-    api.rotation.set(ref.current.rotation.x, ref.current.rotation.y += THREE.MathUtils.degToRad(360 / rotation), ref.current.rotation.z);
+    const offset = planetRef.current.position.applyEuler(eu);
+    planetApi.position.copy(offset);
+    textRef.current.position.set(offset.x, offset.y + size + 5, offset.z);
+    textRef.current.lookAt(new THREE.Vector3(0, offset.y + size + 5, 0))
+    planetApi.rotation.set(planetRef.current.rotation.x, planetRef.current.rotation.y += THREE.MathUtils.degToRad(360 / rotation), planetRef.current.rotation.z);
   });
 
   // Chooses appropriate planet texture
@@ -74,19 +82,30 @@ function Planet({ distance, size, speed, rotation, name }) {
 
   // Returns the planet
   return (
-    <mesh ref={ref} position={[0, 0, -distance]} onClick={() => { console.log(ref); setState({ selectedRef: ref }) }}>
-      <sphereBufferGeometry args={[size]} />
-      {map != null ?
-        <meshStandardMaterial map={texture} />
-        :
-        <meshLambertMaterial color='pink' />
-      }
+    <mesh>
+      <Text
+        ref={textRef}
+        position={[0, size + 5, 0]}
+        scale={[size * 10, size * 10, size * 10]}
+        color='white'
+      >
+        {name}
+      </Text>
+      <mesh ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun') { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
+        <sphereBufferGeometry args={[size]} />
+        {map != null ?
+          <meshStandardMaterial map={texture} />
+          :
+          <meshLambertMaterial color='pink' />
+        }
+      </mesh>
     </mesh>
   )
 }
 
 function CameraControls() {
-  const { state } = useContext(AppContext);
+  // Allows for global state
+  const { state, setState } = useContext(AppContext);
 
   const {
     camera,
@@ -100,9 +119,15 @@ function CameraControls() {
     // Locks camera to target
     if (state.selectedRef !== null && state.selectedRef.current !== null) {
       camera.lookAt(0, 0, 0);
-      const quaternion = new THREE.Quaternion();
       const goodPos = new THREE.Vector3(state.selectedRef.current.position.x, state.selectedRef.current.position.y + 20, state.selectedRef.current.position.z).multiplyScalar(1.5)
-      camera.position.lerp(goodPos, .1);
+      if (state.shouldLerp === true) {
+        camera.position.lerp(goodPos, .1);
+        setTimeout(() => {
+          setState({ selectedRef: { ...state.selectedRef }, shouldLerp: false })
+        }, 750);
+      } else {
+        camera.position.copy(goodPos);
+      }
       camera.updateProjectionMatrix();
     }
     // else {
@@ -122,25 +147,40 @@ function CameraControls() {
 }
 
 function App() {
+  const [secPerYear, setSecPerYear] = useState(365);
   // Seconds (60 frames) per year (1 earth revolution)
-  const revTime = 365;
+  const revTime = secPerYear;
 
   // Constants for comparison
   const earthDist = 100;
   const earthSize = 1;
 
   // State variables
-  const [state, setState] = useState({ selectedRef: null });
+  const [state, setState] = useState({ selectedRef: null, shouldLerp: true });
 
+  // Resets target
   document.addEventListener('contextmenu', (e) => {
     e.preventDefault();
-    if (state.selectedRef !== null)
-      setState({ selectedRef: null })
+    if (state.selectedRef !== null) {
+      setState({ selectedRef: null, shouldLerp: true })
+    }
   }, false)
 
   // Main renderer
   return (
     <div className="App">
+      <div>
+        <input type='range' min={1} max={1825} value={secPerYear} step={1} list='steplist' className='overlayInput' onInput={e => setSecPerYear(e.target.value)}></input>
+        <datalist id='steplist'>
+          <option>1</option>
+          <option>365</option>
+          <option>730</option>
+          <option>1095</option>
+          <option>1460</option>
+          <option>1825</option>
+        </datalist>
+        <label className='overlayText'>{(365/secPerYear).toFixed(2)}x</label>
+      </div>
       <Canvas colorManagement camera={{ position: [50, 50, 50] }}>
         <AppContext.Provider value={{ state, setState }} >
           <Stars radius={250} />
@@ -163,7 +203,7 @@ function App() {
           </Physics>
         </AppContext.Provider>
       </Canvas>
-    </div>
+    </div >
   );
 }
 
