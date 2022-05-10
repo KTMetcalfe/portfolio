@@ -42,8 +42,9 @@ function Planet({ distance, size, speed, rotation, name }) {
 
     const offset = planetRef.current.position.applyEuler(eu);
     planetApi.position.copy(offset);
-    textRef.current.position.set(offset.x, offset.y + size + 5, offset.z);
+
     textRef.current.lookAt(new THREE.Vector3(0, offset.y + size + 5, 0))
+
     planetApi.rotation.set(planetRef.current.rotation.x, planetRef.current.rotation.y += THREE.MathUtils.degToRad(360 / rotation), planetRef.current.rotation.z);
   });
 
@@ -82,7 +83,7 @@ function Planet({ distance, size, speed, rotation, name }) {
 
   // Returns the planet
   return (
-    <mesh>
+    <mesh ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun') { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
       <Text
         ref={textRef}
         position={[0, size + 5, 0]}
@@ -91,14 +92,12 @@ function Planet({ distance, size, speed, rotation, name }) {
       >
         {name}
       </Text>
-      <mesh ref={planetRef} position={[0, 0, -distance]} onClick={() => { console.log(planetRef); if (name !== 'Sun') { setState({ selectedRef: planetRef, shouldLerp: true }) } }}>
-        <sphereBufferGeometry args={[size]} />
-        {map != null ?
-          <meshStandardMaterial map={texture} />
-          :
-          <meshLambertMaterial color='pink' />
-        }
-      </mesh>
+      <sphereBufferGeometry args={[size]} />
+      {map != null ?
+        <meshStandardMaterial map={texture} />
+        :
+        <meshLambertMaterial color='pink' />
+      }
     </mesh>
   )
 }
@@ -179,7 +178,7 @@ function App() {
           <option>1460</option>
           <option>1825</option>
         </datalist>
-        <label className='overlayText'>{(365/secPerYear).toFixed(2)}x</label>
+        <label className='overlayText'>{(365 / secPerYear).toFixed(2)}x</label>
       </div>
       <Canvas colorManagement camera={{ position: [50, 50, 50] }}>
         <AppContext.Provider value={{ state, setState }} >
