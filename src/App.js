@@ -181,7 +181,7 @@ function App() {
           <option value={"Neptune"}>Neptune</option>
         </select> */}
         <button disabled={state.shouldLerp === true} className='overlayText' onClick={() => { setState({ selectedRef: null, shouldLerp: true }) }}>Deselect</button>
-        <input type='range' min={1} max={1825} value={secPerYear} step={1} list='steplist' className='overlayInput' onInput={e => setSecPerYear(e.target.value)}></input>
+        <input type='range' min={1} max={1825} value={secPerYear} step={1} list='steplist' className='overlayInput' onInput={e => setSecPerYear(Number(e.target.value))}></input>
         <datalist id='steplist'>
           <option>1</option>
           <option>365</option>
@@ -190,7 +190,7 @@ function App() {
           <option>1460</option>
           <option>1825</option>
         </datalist>
-        <label className='overlayText'>{(365 / secPerYear).toFixed(2)}x</label>
+        <label className='overlayText'>{secPerYear === 31536000 ? '(1 second = 1 second)' : secPerYear === 365 ? '(1 second = 1 day)' : (365 / secPerYear).toFixed(2)}x</label>
         <button disabled={secPerYear === 31536000} className='overlayText' onClick={() => setSecPerYear(31536000)}>Realtime</button>
       </div>
       <Canvas colorManagement camera={{ position: [50, 50, 50] }}>
