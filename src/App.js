@@ -53,7 +53,12 @@ function Planet({ distance, size, speed, rotation, name }) {
       textRef.current.lookAt(new THREE.Vector3(0, offset.y + size * 2, 0));
     }
 
-    planetApi.rotation.set(planetRef.current.rotation.x, planetRef.current.rotation.y += THREE.MathUtils.degToRad(360 / ((rotation / 365) * 60)), planetRef.current.rotation.z);
+    if (rotation !== 0) {
+      planetApi.rotation.set(
+        planetRef.current.rotation.x,
+        planetRef.current.rotation.y += THREE.MathUtils.degToRad(360 / ((rotation / 365) * 60)),
+        planetRef.current.rotation.z);
+    }
   });
 
   // Chooses appropriate planet texture
@@ -177,6 +182,7 @@ function FPSUpdater() {
 }
 
 function App() {
+  const [lowMotion, setLowMotion] = useState(false);
   const [secPerYear, setSecPerYear] = useState(365);
   // Seconds (60 frames) per year (1 earth revolution)
   const earthRev = secPerYear;
@@ -225,6 +231,7 @@ function App() {
         </datalist>
         <label className='overlayText'>{secPerYear === 31536000 ? '(1 second = 1 second)' : secPerYear === 365 ? '(1 second = 1 day)' : (365 / secPerYear).toFixed(2)}x</label>
         <button disabled={secPerYear === 31536000} className='overlayText' onClick={() => setSecPerYear(31536000)}>Realtime</button>
+        <button className='overlayText' onClick={() => setLowMotion(!lowMotion)}>{lowMotion ? 'Spin' : 'No-spin'}</button>
         {/* Distance modifier
         <input type='range' min={1} max={500} value={earthDistance} className='overlayInput' onInput={e => setEarthDistance(Number(e.target.value))}></input>
         <label className='overlayText'>{earthDistance}</label> */}
@@ -238,16 +245,16 @@ function App() {
           <pointLight intensity={2} />
           <Physics>
             <Suspense fallback={null}>
-              <Planet distance={0} size={20 * earthSize} speed={0} rotation={earthRev * 27} name='Sun' />
-              <Planet distance={0.39 * earthDist} size={0.38 * earthSize} speed={earthRev * 0.24} rotation={earthRev * 58.67} name='Mercury' />
-              <Planet distance={0.72 * earthDist} size={0.95 * earthSize} speed={earthRev * 0.62} rotation={earthRev * 243.02} name='Venus' />
-              <Planet distance={earthDist} size={earthSize} speed={earthRev} rotation={earthRev} name='Earth' />
+              <Planet distance={0} size={20 * earthSize} speed={0} rotation={lowMotion ? 0 : earthRev * 27} name='Sun' />
+              <Planet distance={0.39 * earthDist} size={0.38 * earthSize} speed={earthRev * 0.24} rotation={lowMotion ? 0 : earthRev * 58.67} name='Mercury' />
+              <Planet distance={0.72 * earthDist} size={0.95 * earthSize} speed={earthRev * 0.62} rotation={lowMotion ? 0 : earthRev * 243.02} name='Venus' />
+              <Planet distance={earthDist} size={earthSize} speed={earthRev} rotation={lowMotion ? 0 : earthRev} name='Earth' />
               {/* Distance is SCALED DOWN for the last five planets */}
-              <Planet distance={1.52 * earthDist / 1.25} size={0.53 * earthSize} speed={earthRev * 1.88} rotation={earthRev * 1.02} name='Mars' />
-              <Planet distance={5.2 * earthDist / 3} size={10.97 * earthSize} speed={earthRev * 11.86} rotation={earthRev * 0.42} name='Jupiter' />
-              <Planet distance={9.54 * earthDist / 4} size={9.14 * earthSize} speed={earthRev * 29.42} rotation={earthRev * 0.44} name='Saturn' />
-              <Planet distance={19.18 * earthDist / 6} size={3.98 * earthSize} speed={earthRev * 83.75} rotation={earthRev * 0.72} name='Uranus' />
-              <Planet distance={30.06 * earthDist / 8} size={3.86 * earthSize} speed={earthRev * 163.72} rotation={earthRev * 0.67} name='Neptune' />
+              <Planet distance={1.52 * earthDist / 1.25} size={0.53 * earthSize} speed={earthRev * 1.88} rotation={lowMotion ? 0 : earthRev * 1.02} name='Mars' />
+              <Planet distance={5.2 * earthDist / 3} size={10.97 * earthSize} speed={earthRev * 11.86} rotation={lowMotion ? 0 : earthRev * 0.42} name='Jupiter' />
+              <Planet distance={9.54 * earthDist / 4} size={9.14 * earthSize} speed={earthRev * 29.42} rotation={lowMotion ? 0 : earthRev * 0.44} name='Saturn' />
+              <Planet distance={19.18 * earthDist / 6} size={3.98 * earthSize} speed={earthRev * 83.75} rotation={lowMotion ? 0 : earthRev * 0.72} name='Uranus' />
+              <Planet distance={30.06 * earthDist / 8} size={3.86 * earthSize} speed={earthRev * 163.72} rotation={lowMotion ? 0 : earthRev * 0.67} name='Neptune' />
             </Suspense>
           </Physics>
         </AppContext.Provider>
