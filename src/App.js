@@ -40,7 +40,9 @@ function Planet({ distance, size, speed, rotation, name }) {
       THREE.MathUtils.degToRad(0)
     );
 
-    const offset = planetRef.current.position.applyEuler(eu);
+    // Sets to expected radius
+    const multiple = 1 + ((distance - planetRef.current.position.distanceTo(new THREE.Vector3(0, 0, 0))) / distance);
+    const offset = planetRef.current.position.multiplyScalar(multiple > 1.01 || multiple < 0.99 || isNaN(multiple) ? 1 : multiple).applyEuler(eu);
     planetApi.position.copy(offset);
 
     if (state.selectedRef !== null && state.selectedRef.current !== null && state.selectedRef.current.geometry.parameters !== null) {
@@ -96,7 +98,7 @@ function Planet({ distance, size, speed, rotation, name }) {
         scale={[size * 10, size * 10, size * 10]}
         color='white'
       >
-        {name !== 'Sun' && name !== state.selectedRef?.current.name ? name : ''}
+        {name !== 'Sun' && name !== state?.selectedRef?.current.name ? name : ''}
       </Text>
       <sphereBufferGeometry args={[size]} />
       {map != null ?
@@ -154,13 +156,34 @@ function CameraControls() {
   )
 }
 
+function FPSUpdater() {
+  let second = 0;
+  let frames = 0;
+  useFrame(() => {
+    const date = new Date();
+    const newSecond = date.getSeconds();
+
+    frames++;
+    if (newSecond !== second) {
+      second = date.getSeconds();
+      console.log(frames);
+      frames = 0;
+    }
+  })
+
+  return (
+    <></>
+  )
+}
+
 function App() {
   const [secPerYear, setSecPerYear] = useState(365);
   // Seconds (60 frames) per year (1 earth revolution)
   const revTime = secPerYear;
 
   // Constants for comparison
-  const earthDist = 100;
+  const [earthDistance, setEarthDistance] = useState(100);
+  const earthDist = earthDistance;
   const earthSize = 1;
 
   // State variables
@@ -178,7 +201,8 @@ function App() {
   return (
     <div className="App">
       <div className='overlay'>
-        {/* <select className='overlayText' value={state.selectedRef === null ? 'default' : state.selectedRef?.current.name} onSelect={e => {}}>
+        {/* Planet selecter 
+        <select className='overlayText' value={state.selectedRef === null ? 'default' : state.selectedRef?.current.name} onSelect={e => {}}>
           <option disabled selected value={'default'}>Select a planet</option>
           <option value={"Mercury"}>Mercury</option>
           <option value={"Venus"}>Venus</option>
@@ -201,8 +225,12 @@ function App() {
         </datalist>
         <label className='overlayText'>{secPerYear === 31536000 ? '(1 second = 1 second)' : secPerYear === 365 ? '(1 second = 1 day)' : (365 / secPerYear).toFixed(2)}x</label>
         <button disabled={secPerYear === 31536000} className='overlayText' onClick={() => setSecPerYear(31536000)}>Realtime</button>
+        {/* Distance modifier
+        <input type='range' min={1} max={500} value={earthDistance} className='overlayInput' onInput={e => setEarthDistance(Number(e.target.value))}></input>
+        <label className='overlayText'>{earthDistance}</label> */}
       </div>
       <Canvas camera={{ position: [50, 50, 50] }}>
+        <FPSUpdater />
         <AppContext.Provider value={{ state, setState }} >
           <Stars radius={250} />
           <CameraControls />
