@@ -239,15 +239,15 @@ function App() {
           <Physics>
             <Suspense fallback={null}>
               <Planet distance={0} size={20 * earthSize} speed={0} rotation={revTime * 27} name='Sun' />
-              <Planet distance={0.39 * earthDist} size={0.38 * earthSize} speed={revTime / 0.62} rotation={revTime * 58.67} name='Mercury' />
-              <Planet distance={0.72 * earthDist} size={0.95 * earthSize} speed={revTime / 0.24} rotation={revTime * 243.02} name='Venus' />
+              <Planet distance={0.39 * earthDist} size={0.38 * earthSize} speed={revTime * 0.62} rotation={revTime * 58.67} name='Mercury' />
+              <Planet distance={0.72 * earthDist} size={0.95 * earthSize} speed={revTime * 0.24} rotation={revTime * 243.02} name='Venus' />
               <Planet distance={earthDist} size={earthSize} speed={revTime} rotation={revTime * 0.99} name='Earth' />
               {/* Distance is SCALED DOWN for the last five planets */}
-              <Planet distance={1.52 * earthDist / 1.25} size={0.53 * earthSize} speed={revTime / 1.88} rotation={revTime * 1.02} name='Mars' />
-              <Planet distance={5.2 * earthDist / 3} size={10.97 * earthSize} speed={revTime / 11.86} rotation={revTime * 0.42} name='Jupiter' />
-              <Planet distance={9.54 * earthDist / 4} size={9.14 * earthSize} speed={revTime / 29.46} rotation={revTime * 0.44} name='Saturn' />
-              <Planet distance={19.18 * earthDist / 6} size={3.98 * earthSize} speed={revTime / 164.79} rotation={revTime * 0.72} name='Uranus' />
-              <Planet distance={30.06 * earthDist / 8} size={3.86 * earthSize} speed={revTime / 248.59} rotation={revTime * 0.67} name='Neptune' />
+              <Planet distance={1.52 * earthDist / 1.25} size={0.53 * earthSize} speed={revTime * 1.88} rotation={revTime * 1.02} name='Mars' />
+              <Planet distance={5.2 * earthDist / 3} size={10.97 * earthSize} speed={revTime * 11.86} rotation={revTime * 0.42} name='Jupiter' />
+              <Planet distance={9.54 * earthDist / 4} size={9.14 * earthSize} speed={revTime * 29.46} rotation={revTime * 0.44} name='Saturn' />
+              <Planet distance={19.18 * earthDist / 6} size={3.98 * earthSize} speed={revTime * 83.75} rotation={revTime * 0.72} name='Uranus' />
+              <Planet distance={30.06 * earthDist / 8} size={3.86 * earthSize} speed={revTime * 163.72} rotation={revTime * 0.67} name='Neptune' />
             </Suspense>
           </Physics>
         </AppContext.Provider>
